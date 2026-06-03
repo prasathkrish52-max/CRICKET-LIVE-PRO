@@ -1,0 +1,197 @@
+@import "tailwindcss";
+
+@theme {
+  --color-stadium-emerald: #10B981;
+  --color-stadium-navy: #0F172A;
+  --color-stadium-gold: #F59E0B;
+  --color-stadium-pitch: #020617;
+  --color-stadium-accent: #38BDF8;
+}
+
+:root {
+  --background: #020617;
+  --foreground: #F8FAFC;
+  --stadium-gold: #F59E0B;
+  --stadium-emerald: #10B981;
+  --stadium-navy: #0F172A;
+  --glass-bg: rgba(15, 23, 42, 0.6);
+  --glass-border: rgba(255, 255, 255, 0.08);
+  --stadium-glow: 0 0 20px rgba(245, 158, 11, 0.3);
+}
+
+body {
+  background-color: var(--background);
+  background-image: 
+    radial-gradient(circle at 50% -20%, rgba(16, 185, 129, 0.15) 0%, transparent 50%),
+    radial-gradient(circle at 50% 120%, rgba(56, 189, 248, 0.1) 0%, transparent 50%);
+  color: var(--foreground);
+  font-family: var(--font-inter), system-ui, sans-serif;
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+/* Premium Typography */
+h1, h2, h3, h4 {
+  font-family: var(--font-outfit), sans-serif;
+  font-weight: 800;
+  letter-spacing: -0.04em;
+  text-transform: uppercase;
+}
+
+.score-number {
+  font-family: var(--font-inter), monospace;
+  font-weight: 900;
+  letter-spacing: -0.05em;
+  font-variant-numeric: tabular-nums;
+}
+
+
+/* Advanced Glassmorphism */
+.glass-card {
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.05) 0%, rgba(255, 255, 255, 0.01) 100%);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid var(--glass-border);
+  box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.8);
+}
+
+.glass-panel {
+  background: rgba(15, 23, 42, 0.8);
+  backdrop-filter: blur(12px);
+  border: 1px solid var(--glass-border);
+}
+
+/* Stadium Specific UI */
+.stadium-border-gold {
+  border-color: var(--stadium-gold);
+  box-shadow: var(--stadium-glow);
+}
+
+.bg-pitch {
+  background: linear-gradient(180deg, #020617 0%, #0F172A 100%);
+}
+
+/* Animations */
+@keyframes glow-pulse {
+  0%, 100% { opacity: 1; transform: scale(1); filter: brightness(1); }
+  50% { opacity: 0.8; transform: scale(1.05); filter: brightness(1.2); }
+}
+
+.animate-live {
+  animation: glow-pulse 2s infinite ease-in-out;
+}
+
+@keyframes slide-up {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.animate-slide-up {
+  animation: slide-up 0.6s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+}
+
+/* Scrollbar Style */
+::-webkit-scrollbar {
+  width: 5px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--background);
+}
+
+::-webkit-scrollbar-thumb {
+  background: linear-gradient(to bottom, var(--stadium-emerald), var(--stadium-gold));
+  border-radius: 10px;
+}
+
+/* Utility Overrides */
+.text-gold { color: var(--stadium-gold); }
+.text-emerald { color: var(--stadium-emerald); }
+
+.stadium-shadow {
+  box-shadow: 0 0 40px rgba(0, 0, 0, 0.6);
+}
+
+/* ── Ball Event Animations ─────────────────────────────────────────────── */
+
+/* Score flash: runs added */
+@keyframes score-flash {
+  0%   { transform: scale(1);    opacity: 1; }
+  30%  { transform: scale(1.25); opacity: 1; color: #F59E0B; }
+  60%  { transform: scale(1.1);  opacity: 1; }
+  100% { transform: scale(1);    opacity: 1; }
+}
+.animate-score-flash {
+  animation: score-flash 0.5s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+}
+
+/* Boundary glow: 4 runs */
+@keyframes boundary-4 {
+  0%   { box-shadow: 0 0 0 0 rgba(245,158,11,0); background-color: rgba(245,158,11,0.1); }
+  40%  { box-shadow: 0 0 24px 8px rgba(245,158,11,0.5); background-color: rgba(245,158,11,0.3); }
+  100% { box-shadow: 0 0 0 0 rgba(245,158,11,0); background-color: rgba(245,158,11,0.1); }
+}
+.animate-boundary-4 {
+  animation: boundary-4 0.8s ease-out forwards;
+}
+
+/* Six glow: 6 runs */
+@keyframes boundary-6 {
+  0%   { box-shadow: 0 0 0 0 rgba(16,185,129,0); background-color: rgba(16,185,129,0.1); }
+  40%  { box-shadow: 0 0 32px 12px rgba(16,185,129,0.6); background-color: rgba(16,185,129,0.3); }
+  100% { box-shadow: 0 0 0 0 rgba(16,185,129,0); background-color: rgba(16,185,129,0.1); }
+}
+.animate-boundary-6 {
+  animation: boundary-6 0.8s ease-out forwards;
+}
+
+/* Wicket flash */
+@keyframes wicket-flash {
+  0%   { background-color: rgba(239,68,68,0);   box-shadow: 0 0 0 0 rgba(239,68,68,0); }
+  30%  { background-color: rgba(239,68,68,0.35); box-shadow: 0 0 40px 12px rgba(239,68,68,0.5); }
+  70%  { background-color: rgba(239,68,68,0.15); box-shadow: 0 0 20px 4px rgba(239,68,68,0.2); }
+  100% { background-color: rgba(239,68,68,0);   box-shadow: 0 0 0 0 rgba(239,68,68,0); }
+}
+.animate-wicket {
+  animation: wicket-flash 1s ease-out forwards;
+}
+
+/* Ball dot: dot ball emphasis */
+@keyframes dot-in {
+  0%   { transform: scale(0.6); opacity: 0; }
+  100% { transform: scale(1);   opacity: 1; }
+}
+.animate-ball-in {
+  animation: dot-in 0.25s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+}
+
+/* Skeleton shimmer */
+@keyframes shimmer {
+  0%   { background-position: -200% 0; }
+  100% { background-position:  200% 0; }
+}
+.skeleton {
+  background: linear-gradient(90deg, rgba(255,255,255,0.04) 25%, rgba(255,255,255,0.09) 50%, rgba(255,255,255,0.04) 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.6s infinite linear;
+  border-radius: 0.75rem;
+}
+
+/* Fade in */
+@keyframes fade-in {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+.animate-fade-in {
+  animation: fade-in 0.4s ease-out forwards;
+}
+
+/* Ping once (for live dot) */
+@keyframes ping-once {
+  0%   { transform: scale(1);   opacity: 0.8; }
+  80%  { transform: scale(2.2); opacity: 0; }
+  100% { transform: scale(2.2); opacity: 0; }
+}
+.animate-ping-once {
+  animation: ping-once 1s ease-out forwards;
+}
