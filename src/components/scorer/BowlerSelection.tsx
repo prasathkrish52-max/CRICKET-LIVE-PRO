@@ -24,7 +24,17 @@ export const BowlerSelection = ({ matchId, bowlingTeamId, inningsId, onSelect }:
       .eq("match_id", matchId)
       .eq("team_id", bowlingTeamId);
     
-    setBowlers(xi || []);
+    let bowlersList = xi?.map((x: any) => x.player) || [];
+
+    if (bowlersList.length === 0) {
+      const { data: teamPlayers } = await supabase
+        .from("players")
+        .select("*")
+        .eq("team_id", bowlingTeamId);
+      bowlersList = teamPlayers || [];
+    }
+
+    setBowlers(bowlersList);
     setLoading(false);
   }, [matchId, bowlingTeamId]);
 
@@ -57,14 +67,14 @@ export const BowlerSelection = ({ matchId, bowlingTeamId, inningsId, onSelect }:
           <div className="grid gap-2">
             {bowlers.map((b) => (
               <button
-                key={b.player.id}
+                key={b.id}
                 disabled={isProcessing}
-                onClick={() => handleBowlerChange(b.player.id)}
+                onClick={() => handleBowlerChange(b.id)}
                 className="w-full text-left p-4 bg-white/5 hover:bg-stadium-gold/10 border border-white/10 rounded-xl transition-all group"
               >
                 <div className="flex justify-between items-center">
-                  <span className="font-bold text-sm group-hover:text-stadium-gold">{b.player.name}</span>
-                  <span className="text-[10px] text-slate-500 uppercase font-bold">{b.player.bowling_style || "Bowler"}</span>
+                  <span className="font-bold text-sm group-hover:text-stadium-gold">{b.name}</span>
+                  <span className="text-[10px] text-slate-500 uppercase font-bold">{b.bowling_style || "Bowler"}</span>
                 </div>
               </button>
             ))}

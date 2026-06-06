@@ -23,6 +23,17 @@ export const BatterSelection = ({ matchId, battingTeamId, inningsId, onSelect }:
       .eq("match_id", matchId)
       .eq("team_id", battingTeamId);
 
+    let playersList = xi?.map((x: any) => x.player) || [];
+
+    // Fallback: If no playing XI, get all squad players
+    if (playersList.length === 0) {
+      const { data: teamPlayers } = await supabase
+        .from("players")
+        .select("*")
+        .eq("team_id", battingTeamId);
+      playersList = teamPlayers || [];
+    }
+
     // 2. Get Dismissed Players from balls table for this innings
     const { data: balls } = await supabase
       .from("balls")
@@ -41,7 +52,7 @@ export const BatterSelection = ({ matchId, battingTeamId, inningsId, onSelect }:
     const activeIds = [currentInnings?.current_striker_id, currentInnings?.current_non_striker_id];
     const unavailableIds = [...dismissedIds, ...activeIds];
 
-    const available = xi?.filter((p: any) => !unavailableIds.includes(p.player_id)) || [];
+    const available = playersList.filter((p: any) => !unavailableIds.includes(p.id)) || [];
     setAvailableBatsmen(available);
     setLoading(false);
   }, [matchId, battingTeamId, inningsId]);
@@ -63,15 +74,15 @@ export const BatterSelection = ({ matchId, battingTeamId, inningsId, onSelect }:
         <CardBody className="space-y-3 max-h-[400px] overflow-y-auto pr-2 custom-scrollbar">
           {availableBatsmen.map((p) => (
             <button
-              key={p.player.id}
-              onClick={() => onSelect(p.player.id)}
+              key={p.id}
+              onClick={() => onSelect(p.id)}
               className="w-full text-left p-4 bg-white/5 hover:bg-stadium-gold/10 border border-white/10 rounded-xl transition-all group flex justify-between items-center"
             >
               <div>
-                <div className="font-bold text-sm group-hover:text-stadium-gold">{p.player.name}</div>
-                <div className="text-[8px] text-slate-500 uppercase font-black">{p.player.role || "Batsman"}</div>
+                <div className="font-bold text-sm group-hover:text-stadium-gold">{p.name}</div>
+                <div className="text-[8px] text-slate-500 uppercase font-black">{p.role || "Batsman"}</div>
               </div>
-              <div className="text-xs font-black text-slate-600">#{p.player.jersey_number || "—"}</div>
+              <div className="text-xs font-black text-slate-600">#{p.jersey_number || "—"}</div>
             </button>
           ))}
           {availableBatsmen.length === 0 && (

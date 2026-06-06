@@ -5,6 +5,7 @@ export interface TournamentCreateData {
   format: 'league' | 'knockout' | 'hybrid';
   start_date?: string;
   end_date?: string;
+  overs_per_match?: number;
 }
 
 export const tournamentService = {
@@ -47,7 +48,7 @@ export const tournamentService = {
       .from('tournament_settings')
       .insert({
         tournament_id: tournament.id,
-        overs_per_match: 20,
+        overs_per_match: tournamentData.overs_per_match || 20,
         balls_per_over: 6,
         points_per_win: 2,
         points_per_tie: 1,

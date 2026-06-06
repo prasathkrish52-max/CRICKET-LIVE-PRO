@@ -56,10 +56,35 @@ export const scoringService = {
 
     if (ballError) throw ballError;
 
-    // Optional: Compute current innings state and update
-    // This is often handled efficiently via triggers in PostgreSQL
+    await scoringService.recalculateInnings(ballData.innings_id);
     
     return ball;
+  },
+
+  async recalculateInnings(inningsId: string) {
+    const { data: balls } = await supabase.from('balls').select('*').eq('innings_id', inningsId);
+    
+    let totalRuns = 0;
+    let totalWickets = 0;
+    let legalBalls = 0;
+    let extras = 0;
+
+    balls?.forEach(b => {
+      totalRuns += b.runs_scored + (b.extra_runs || 0);
+      if (b.extra_runs) extras += b.extra_runs;
+      if (b.extra_type !== 'wide' && b.extra_type !== 'no_ball') legalBalls++;
+      if (b.is_wicket) totalWickets++;
+    });
+
+    const overs = legalBalls > 0 ? parseFloat(`${Math.floor(legalBalls/6)}.${legalBalls%6}`) : 0.0;
+
+    await supabase.from('innings').update({
+      total_runs: totalRuns,
+      total_wickets: totalWickets,
+      balls: legalBalls,
+      overs: overs,
+      extras: extras
+    }).eq('id', inningsId);
   },
 
   /**
@@ -109,6 +134,8 @@ export const scoringService = {
       .eq('id', lastBall.id);
 
     if (deleteError) throw deleteError;
+
+    await scoringService.recalculateInnings(inningsId);
 
     return lastBall;
   }

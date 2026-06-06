@@ -17,6 +17,7 @@ export function TournamentForm({ onSuccess, onCancel }: TournamentFormProps) {
     format: "league",
     start_date: "",
     end_date: "",
+    overs_per_match: 20,
   });
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -56,7 +57,7 @@ export function TournamentForm({ onSuccess, onCancel }: TournamentFormProps) {
         />
       </div>
 
-      <div className="grid md:grid-cols-2 gap-6">
+      <div className="grid md:grid-cols-3 gap-6">
         <div>
           <label className="block text-xs font-black text-slate-400 uppercase tracking-widest mb-2">
             Format
@@ -70,6 +71,20 @@ export function TournamentForm({ onSuccess, onCancel }: TournamentFormProps) {
             <option value="knockout">Knockout (Elimination)</option>
             <option value="hybrid">Hybrid (League + Knockout)</option>
           </select>
+        </div>
+
+        <div>
+          <label className="block text-xs font-black text-slate-400 uppercase tracking-widest mb-2">
+            Overs Per Match
+          </label>
+          <input
+            required
+            type="number"
+            min="1"
+            className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-stadium-gold transition-colors"
+            value={formData.overs_per_match || ""}
+            onChange={(e) => setFormData({ ...formData, overs_per_match: parseInt(e.target.value) || 20 })}
+          />
         </div>
 
         <div>

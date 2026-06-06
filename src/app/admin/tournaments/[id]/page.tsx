@@ -238,14 +238,14 @@ export default function TournamentDetailPage({ params }: { params: Promise<{ id:
                 <div className="grid md:grid-cols-2 gap-4">
                   {tournamentTeams.map((team: any) => (
                     <div key={team.id} className="glass-card p-4 flex items-center justify-between gap-4 border-white/5 group hover:border-white/10 transition-all">
-                      <div className="flex items-center gap-3">
+                      <Link href={`/admin/teams/${team.id}`} className="flex items-center gap-3 hover:opacity-80 transition-opacity">
                         <div className="w-10 h-10 rounded-xl bg-stadium-navy border border-white/10 overflow-hidden flex items-center justify-center shrink-0">
                           {team.logo_url
                             ? <img src={team.logo_url} alt={team.name} className="w-full h-full object-cover" />
                             : <span className="text-sm font-black text-stadium-gold">{team.name[0]}</span>}
                         </div>
                         <span className="text-white font-black uppercase text-sm tracking-tight">{team.name}</span>
-                      </div>
+                      </Link>
                       <button
                         onClick={() => handleRemoveTeam(team.id, team.name)}
                         disabled={registeringTeamId === team.id}
