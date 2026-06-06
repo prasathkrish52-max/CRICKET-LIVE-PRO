@@ -12,11 +12,7 @@ export default function TeamDetailPage({ params }: { params: Promise<{ id: strin
   const [team, setTeam] = useState<any>(null);
   const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    fetchTeamDetails();
-  }, [id]);
-
-  const fetchTeamDetails = async () => {
+  const fetchTeamDetails = React.useCallback(async () => {
     try {
       const data = await teamService.getTeamWithPlayers(id);
       setTeam(data);
@@ -25,7 +21,12 @@ export default function TeamDetailPage({ params }: { params: Promise<{ id: strin
     } finally {
       setLoading(false);
     }
-  };
+  }, [id]);
+
+  useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    fetchTeamDetails();
+  }, [fetchTeamDetails]);
 
   if (loading) {
     return (

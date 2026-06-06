@@ -18,11 +18,7 @@ export default function MatchManagementPage({ params }: { params: { id: string }
   const [schedule, setSchedule] = useState({ date: "", time: "", venue: "" });
   const [toss, setToss] = useState({ won_by: "", decision: "bat" });
 
-  useEffect(() => {
-    fetchMatch();
-  }, [params.id]);
-
-  const fetchMatch = async () => {
+  const fetchMatch = React.useCallback(async () => {
     const { data, error } = await supabase
       .from("matches")
       .select("*, team_a:team_a_id(*), team_b:team_b_id(*)")
@@ -41,7 +37,12 @@ export default function MatchManagementPage({ params }: { params: { id: string }
       }
     }
     setLoading(false);
-  };
+  }, [params.id]);
+
+  useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    fetchMatch();
+  }, [fetchMatch]);
 
   const updateSchedule = async () => {
     setIsProcessing(true);
@@ -85,11 +86,8 @@ export default function MatchManagementPage({ params }: { params: { id: string }
   const [selectedXI_B, setSelectedXI_B] = useState<string[]>([]);
   const [roles, setRoles] = useState<{ [key: string]: "C" | "VC" | null }>({});
 
-  useEffect(() => {
-    if (match) fetchPlayers();
-  }, [match]);
-
-  const fetchPlayers = async () => {
+  const fetchPlayers = React.useCallback(async () => {
+    if (!match) return;
     const { data: playersA } = await supabase.from("players").select("*").eq("team_id", match.team_a_id);
     const { data: playersB } = await supabase.from("players").select("*").eq("team_id", match.team_b_id);
     
@@ -112,7 +110,12 @@ export default function MatchManagementPage({ params }: { params: { id: string }
 
     setTeamAPlayers(playersA || []);
     setTeamBPlayers(playersB || []);
-  };
+  }, [match, params.id]);
+
+  useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    if (match) fetchPlayers();
+  }, [match, fetchPlayers]);
 
   const togglePlayer = (team: 'A' | 'B', playerId: string) => {
     const isTeamA = team === 'A';

@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import { Card, CardBody, CardHeader } from "@/components/ui/Card";
 import { Button } from "@/components/ui/Button";
 import { supabase } from "@/lib/supabase";
@@ -30,11 +30,7 @@ export const MatchInitializer = ({ matchId, inningsId, battingTeamId, bowlingTea
     bowler_id: "",
   });
 
-  useEffect(() => {
-    fetchSquads();
-  }, [matchId]);
-
-  const fetchSquads = async () => {
+  const fetchSquads = useCallback(async () => {
     // Fetch Playing XI for both teams
     const { data: xi } = await supabase
       .from("playing_xi")
@@ -46,7 +42,12 @@ export const MatchInitializer = ({ matchId, inningsId, battingTeamId, bowlingTea
       setBowlingSquad(xi.filter((p: any) => p.team_id === bowlingTeamId));
     }
     setLoading(false);
-  };
+  }, [matchId, battingTeamId, bowlingTeamId]);
+
+  useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    fetchSquads();
+  }, [fetchSquads]);
 
   const handleStartMatch = async () => {
     if (!selection.striker_id || !selection.non_striker_id || !selection.bowler_id) return;

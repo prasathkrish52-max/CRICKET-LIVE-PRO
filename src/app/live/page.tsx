@@ -1,41 +1,38 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useCallback } from "react";
 import { MatchCard } from "@/components/MatchCard";
 import { supabase } from "@/lib/supabase";
 import { Card } from "@/components/ui/Card";
 import { Badge } from "@/components/ui/Badge";
 
+interface Team {
+  name: string;
+  logo_url?: string;
+}
+
+interface Inning {
+  innings_number: number;
+  total_runs: number;
+  total_wickets: number;
+  overs: number;
+}
+
+interface Match {
+  id: string;
+  status: string;
+  match_date: string;
+  venue: string;
+  team_a: Team;
+  team_b: Team;
+  innings?: Inning[];
+}
+
 export default function LiveDashboard() {
-  const [matches, setMatches] = useState<any[]>([]);
+  const [matches, setMatches] = useState<Match[]>([]);
   const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    fetchLiveMatches();
-
-    const matchSub = supabase
-      .channel('live-dashboard')
-      .on('postgres_changes', { event: '*', schema: 'public', table: 'matches' }, (payload) => {
-        setMatches(prev => prev.map(m => m.id === payload.new.id ? { ...m, ...payload.new } : m));
-      })
-      .on('postgres_changes', { event: '*', schema: 'public', table: 'innings' }, (payload) => {
-        // Since innings are nested, we need to re-fetch or find the match
-        // For simplicity and to ensure data consistency with nested teams, 
-        // we'll re-fetch but we could also optimize this further.
-        fetchLiveMatches();
-      })
-      .subscribe();
-
-    // Fallback polling every 30 seconds to ensure data consistency
-    const pollInterval = setInterval(fetchLiveMatches, 30000);
-
-    return () => { 
-      matchSub.unsubscribe(); 
-      clearInterval(pollInterval);
-    };
-  }, []);
-
-  const fetchLiveMatches = async () => {
+  const fetchLiveMatches = useCallback(async () => {
     try {
       const { data, error } = await supabase
         .from('matches')
@@ -56,7 +53,35 @@ export default function LiveDashboard() {
     } finally {
       setLoading(false);
     }
-  };
+  }, []);
+
+  useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    fetchLiveMatches();
+
+    const matchSub = supabase
+      .channel('live-dashboard')
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'matches' }, (payload) => {
+        const newRecord = payload.new as { id?: string };
+        if (!newRecord.id) return;
+        setMatches(prev => prev.map(m => m.id === newRecord.id ? { ...m, ...payload.new } : m));
+      })
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'innings' }, (payload) => {
+        // Since innings are nested, we need to re-fetch or find the match
+        // For simplicity and to ensure data consistency with nested teams, 
+        // we'll re-fetch but we could also optimize this further.
+        fetchLiveMatches();
+      })
+      .subscribe();
+
+    // Fallback polling every 30 seconds to ensure data consistency
+    const pollInterval = setInterval(fetchLiveMatches, 30000);
+
+    return () => { 
+      matchSub.unsubscribe(); 
+      clearInterval(pollInterval);
+    };
+  }, [fetchLiveMatches]);
 
   return (
     <div className="min-h-screen bg-pitch pb-20">
@@ -104,8 +129,8 @@ export default function LiveDashboard() {
           ) : (
             <div className="grid gap-6">
               {matches.filter(m => m.status === 'live').map(match => {
-                const inn1 = match.innings?.find((i: any) => i.innings_number === 1);
-                const inn2 = match.innings?.find((i: any) => i.innings_number === 2);
+                const inn1 = match.innings?.find(i => i.innings_number === 1);
+                const inn2 = match.innings?.find(i => i.innings_number === 2);
                 return (
                   <MatchCard
                     key={match.id}

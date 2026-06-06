@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useState, use } from "react";
+import React, { useEffect, useState, use, useCallback } from "react";
 import { InningsStatus } from "@/components/scorer/InningsStatus";
 import { PointsTable } from "@/components/admin/PointsTable";
 import { supabase } from "@/lib/supabase";
@@ -16,7 +16,22 @@ export default function PublicMatchDetail({ params }: { params: Promise<{ id: st
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState<TabType>("match");
 
+  const fetchMatchData = useCallback(async () => {
+    try {
+      const { data: m } = await supabase.from('matches').select('*, team_a:teams!team_a_id(*), team_b:teams!team_b_id(*)').eq('id', id).single();
+      const { data: ins } = await supabase.from('innings').select('*').eq('match_id', id).order('innings_number', { ascending: true });
+      
+      setMatch(m);
+      setInnings(ins || []);
+    } catch (error) {
+      console.error("Error fetching match detail:", error);
+    } finally {
+      setLoading(false);
+    }
+  }, [id]);
+
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     fetchMatchData();
     
     const sub = supabase
@@ -47,21 +62,7 @@ export default function PublicMatchDetail({ params }: { params: Promise<{ id: st
       sub.unsubscribe(); 
       clearInterval(poll);
     };
-  }, [id]);
-
-  const fetchMatchData = async () => {
-    try {
-      const { data: m } = await supabase.from('matches').select('*, team_a:teams!team_a_id(*), team_b:teams!team_b_id(*)').eq('id', id).single();
-      const { data: ins } = await supabase.from('innings').select('*').eq('match_id', id).order('innings_number', { ascending: true });
-      
-      setMatch(m);
-      setInnings(ins || []);
-    } catch (error) {
-      console.error("Error fetching match detail:", error);
-    } finally {
-      setLoading(false);
-    }
-  };
+  }, [id, fetchMatchData]);
 
   if (loading) return (
     <div className="min-h-screen bg-pitch flex flex-col items-center justify-center text-white gap-4">

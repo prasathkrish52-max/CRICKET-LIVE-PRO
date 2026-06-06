@@ -20,6 +20,7 @@ export const metadata: Metadata = {
 import React from "react";
 import { AuthProvider } from "@/context/AuthContext";
 import { SetupNotice } from "@/components/ui/SetupNotice";
+import { AppWrapper } from "@/components/ui/AppWrapper";
 
 export default function RootLayout({
   children,
@@ -34,7 +35,7 @@ export default function RootLayout({
       >
         <AuthProvider>
           {!isSupabaseConfigured && <SetupNotice />}
-          {children}
+          <AppWrapper>{children}</AppWrapper>
         </AuthProvider>
       </body>
     </html>

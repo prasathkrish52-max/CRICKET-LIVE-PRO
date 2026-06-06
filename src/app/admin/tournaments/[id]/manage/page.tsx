@@ -14,11 +14,7 @@ export default function ManageTournamentPage({ params }: { params: { id: string 
   const [loading, setLoading] = useState(true);
   const [isProcessing, setIsProcessing] = useState(false);
 
-  useEffect(() => {
-    fetchTournamentData();
-  }, [params.id]);
-
-  const fetchTournamentData = async () => {
+  const fetchTournamentData = React.useCallback(async () => {
     setLoading(true);
     
     // 1. Fetch Tournament & Settings
@@ -48,7 +44,12 @@ export default function ManageTournamentPage({ params }: { params: { id: string 
     setAllRegistryTeams(globalTeams || []);
     
     setLoading(false);
-  };
+  }, [params.id]);
+
+  useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    fetchTournamentData();
+  }, [fetchTournamentData]);
 
   const addTeamToTournament = async (teamId: string) => {
     setIsProcessing(true);

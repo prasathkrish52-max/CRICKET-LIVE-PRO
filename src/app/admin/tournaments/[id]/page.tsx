@@ -62,13 +62,13 @@ export default function TournamentDetailPage({ params }: { params: Promise<{ id:
 
   const fetchData = useCallback(async () => {
     try {
-      setError(null);
       const [tData, mData, teamsData, tTeamsData] = await Promise.all([
         tournamentService.getTournamentDetails(id),
         fixtureService.getTournamentMatches(id),
         teamService.getAllTeams(),
         tournamentService.getTournamentTeams(id),
       ]);
+      setError(null);
       setTournament(tData);
       setMatches(mData);
       setAllTeams(teamsData);
@@ -80,6 +80,7 @@ export default function TournamentDetailPage({ params }: { params: Promise<{ id:
     }
   }, [id]);
 
+  // eslint-disable-next-line react-hooks/set-state-in-effect
   useEffect(() => { fetchData(); }, [fetchData]);
 
   const handleRegisterTeam = async (teamId: string, teamName: string) => {

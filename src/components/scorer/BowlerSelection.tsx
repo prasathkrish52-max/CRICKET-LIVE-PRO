@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import { Card, CardBody, CardHeader } from "@/components/ui/Card";
 import { Button } from "@/components/ui/Button";
 import { supabase } from "@/lib/supabase";
@@ -17,11 +17,7 @@ export const BowlerSelection = ({ matchId, bowlingTeamId, inningsId, onSelect }:
   const [loading, setLoading] = useState(true);
   const [isProcessing, setIsProcessing] = useState(false);
 
-  useEffect(() => {
-    fetchBowlers();
-  }, [matchId]);
-
-  const fetchBowlers = async () => {
+  const fetchBowlers = useCallback(async () => {
     const { data: xi } = await supabase
       .from("playing_xi")
       .select("*, player:player_id(*)")
@@ -30,7 +26,12 @@ export const BowlerSelection = ({ matchId, bowlingTeamId, inningsId, onSelect }:
     
     setBowlers(xi || []);
     setLoading(false);
-  };
+  }, [matchId, bowlingTeamId]);
+
+  useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    fetchBowlers();
+  }, [fetchBowlers]);
 
   const handleBowlerChange = async (bowlerId: string) => {
     setIsProcessing(true);

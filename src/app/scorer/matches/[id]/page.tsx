@@ -124,6 +124,7 @@ export default function ScoringPage({ params }: { params: Promise<{ id: string }
   }, [id]);
 
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     fetchMatchData();
     const sub = supabase.channel(`innings-live-${id}`)
       .on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'innings', filter: `match_id=eq.${id}` }, payload => {

@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import { Card, CardBody, CardHeader } from "@/components/ui/Card";
 import { supabase } from "@/lib/supabase";
 
@@ -15,11 +15,7 @@ export const BatterSelection = ({ matchId, battingTeamId, inningsId, onSelect }:
   const [availableBatsmen, setAvailableBatsmen] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    fetchAvailableBatsmen();
-  }, [matchId]);
-
-  const fetchAvailableBatsmen = async () => {
+  const fetchAvailableBatsmen = useCallback(async () => {
     // 1. Get Playing XI
     const { data: xi } = await supabase
       .from("playing_xi")
@@ -48,7 +44,12 @@ export const BatterSelection = ({ matchId, battingTeamId, inningsId, onSelect }:
     const available = xi?.filter((p: any) => !unavailableIds.includes(p.player_id)) || [];
     setAvailableBatsmen(available);
     setLoading(false);
-  };
+  }, [matchId, battingTeamId, inningsId]);
+
+  useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    fetchAvailableBatsmen();
+  }, [fetchAvailableBatsmen]);
 
   if (loading) return <div className="text-center py-10 animate-pulse text-stadium-gold font-bold">READYING NEXT BATTER...</div>;
 

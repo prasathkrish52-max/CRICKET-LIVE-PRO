@@ -33,8 +33,8 @@ export default function AdminTournamentsPage() {
 
   const fetchTournaments = useCallback(async () => {
     try {
-      setError(null);
       const data = await tournamentService.getAllTournaments();
+      setError(null);
       setTournaments(data || []);
     } catch (err: any) {
       setError(err.message || "Failed to fetch tournaments. Please check your Supabase configuration.");
@@ -43,6 +43,7 @@ export default function AdminTournamentsPage() {
     }
   }, []);
 
+  // eslint-disable-next-line react-hooks/set-state-in-effect
   useEffect(() => { fetchTournaments(); }, [fetchTournaments]);
 
   return (

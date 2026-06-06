@@ -21,11 +21,7 @@ export default function SquadManagementPage({ params }: { params: { id: string }
     jersey_number: "",
   });
 
-  useEffect(() => {
-    fetchTeamAndPlayers();
-  }, [params.id]);
-
-  const fetchTeamAndPlayers = async () => {
+  const fetchTeamAndPlayers = React.useCallback(async () => {
     setLoading(true);
     const { data: teamData } = await supabase.from("teams").select("*").eq("id", params.id).single();
     const { data: playersData } = await supabase.from("players").select("*").eq("team_id", params.id).order("name");
@@ -33,7 +29,12 @@ export default function SquadManagementPage({ params }: { params: { id: string }
     setTeam(teamData);
     setPlayers(playersData || []);
     setLoading(false);
-  };
+  }, [params.id]);
+
+  useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    fetchTeamAndPlayers();
+  }, [fetchTeamAndPlayers]);
 
   const handleAddPlayer = async (e: React.FormEvent) => {
     e.preventDefault();

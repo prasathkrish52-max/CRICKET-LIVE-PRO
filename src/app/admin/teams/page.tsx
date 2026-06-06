@@ -33,8 +33,8 @@ export default function AdminTeamsPage() {
 
   const fetchTeams = useCallback(async () => {
     try {
-      setError(null);
       const data = await teamService.getAllTeams();
+      setError(null);
       setTeams(data || []);
     } catch (err: any) {
       setError(err.message || "Failed to fetch teams. Please verify your Supabase setup.");
@@ -43,6 +43,7 @@ export default function AdminTeamsPage() {
     }
   }, []);
 
+  // eslint-disable-next-line react-hooks/set-state-in-effect
   useEffect(() => { fetchTeams(); }, [fetchTeams]);
 
   return (

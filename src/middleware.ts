@@ -1,9 +1,9 @@
-import { createMiddlewareClient } from '@supabase/auth-helpers-nextjs';
 import { NextResponse } from 'next/server';
-import type { NextRequest } from 'next/request';
+import type { NextRequest } from 'next/server';
 
-// NOTE: This middleware assumes @supabase/auth-helpers-nextjs is available.
-// If it's not, we will fall back to layout-level protection.
+// NOTE: This middleware currently only checks paths.
+// You should install @supabase/ssr and configure it properly
+// for actual authentication later.
 export async function middleware(req: NextRequest) {
   const res = NextResponse.next();
   

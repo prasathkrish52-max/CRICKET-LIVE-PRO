@@ -11,11 +11,7 @@ export default function AdminHealthPage() {
   const [loading, setLoading] = useState(true);
   const [lastCheck, setLastCheck] = useState<Date | null>(null);
 
-  useEffect(() => {
-    runDiagnostics();
-  }, []);
-
-  const runDiagnostics = async () => {
+  const runDiagnostics = React.useCallback(async () => {
     setLoading(true);
     try {
       const data = await healthService.runFullDiagnostics();
@@ -26,7 +22,12 @@ export default function AdminHealthPage() {
     } finally {
       setLoading(false);
     }
-  };
+  }, []);
+
+  useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    runDiagnostics();
+  }, [runDiagnostics]);
 
   const connectionReport = reports.find(r => r.type === 'connection');
   const tableReports = reports.filter(r => r.type === 'table');

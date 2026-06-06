@@ -107,7 +107,7 @@ export function TeamForm({ onSuccess, onCancel }: TeamFormProps) {
         <div className="p-4 rounded-2xl bg-amber-500/10 border border-amber-500/20">
           <p className="text-amber-400 text-[10px] font-black uppercase tracking-[0.15em] mb-1">Storage Bucket Missing</p>
           <p className="text-slate-400 text-[10px] font-medium leading-relaxed">
-            Team logos won't be saved until the 'teams' bucket is created in Supabase. You can still create teams without logos.
+            Team logos won&apos;t be saved until the &apos;teams&apos; bucket is created in Supabase. You can still create teams without logos.
           </p>
         </div>
       )}
